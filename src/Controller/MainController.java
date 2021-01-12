@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
@@ -20,7 +19,6 @@ import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.json.*;
 import javafx.scene.control.Label;
-
 import javafx.scene.image.ImageView;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -78,12 +76,14 @@ public class MainController {
         charthourly.setAnimated(true);
         String d = null;///http://ip-api.com/json/");
         try { d = new Requester().requestget("https://weatherextension.com/api/v2/weather/location"); } catch (IOException e) { e.printStackTrace(); }
+
         JSONObject jsonObject = new JSONObject(d.replace("\\u00b0", ""));
+
         String icon = jsonObject.getJSONObject("weather").getJSONObject("currently").getString("iconv2").replace("wi ","").trim();
         lbl_place.setText(jsonObject.getJSONObject("currentLocation").getString("location_name"));
         JSONObject current = jsonObject.getJSONObject("weather").getJSONObject("currently");
         lbl_summary.setText(current.getString("summary"));
-        lbl_temp.setText(current.getString("temperature"));
+        lbl_temp.setText(""+(Integer.parseInt(current.getString("temperature"))- 32) * 5/9);
         lbl_humidity.setText("Humidity : "+current.getInt("humidity")+"%");
         lbl_wind.setText("Wind Speed : "+current.getString("windSpeed"));
         lbl_press.setText("Pressure : "+current.getInt("pressure")+" mb");
@@ -91,14 +91,14 @@ public class MainController {
         for (Object a : jsonObject.getJSONObject("weather").getJSONObject("daily").getJSONArray("data")) {
             JSONObject hasil = new JSONObject(a.toString());
             D_windSpeed.getData().add(new XYChart.Data(hasil.getString("time"),hasil.getInt("windSpeed")));
-            D_tempsH.getData().add(new XYChart.Data(hasil.getString("time"), hasil.getInt("temperatureHigh")));
-            D_tempsL.getData().add(new XYChart.Data(hasil.getString("time"), hasil.getInt("temperatureLow")));
+            D_tempsH.getData().add(new XYChart.Data(hasil.getString("time"), (hasil.getInt("temperatureHigh")- 32) * 5/9));
+            D_tempsL.getData().add(new XYChart.Data(hasil.getString("time"), (hasil.getInt("temperatureLow")- 32) * 5/9));
             D_rainChance.getData().add(new XYChart.Data(hasil.getString("time"), Integer.parseInt(hasil.getString("precipProbability").replace("%",""))));
         }
         for (Object a : jsonObject.getJSONObject("weather").getJSONObject("hourly").getJSONArray("data")) {
             JSONObject hasil = new JSONObject(a.toString());
             H_windSpeed.getData().add(new XYChart.Data(hasil.getString("time"),hasil.getInt("windSpeed")));
-            H_temps.getData().add(new XYChart.Data(hasil.getString("time"), hasil.getInt("temperature")));
+            H_temps.getData().add(new XYChart.Data(hasil.getString("time"), (hasil.getInt("temperature")- 32) * 5/9));
             H_rainChance.getData().add(new XYChart.Data(hasil.getString("time"), Integer.parseInt(hasil.getString("precipProbability").replace("%",""))));
         }
         chartdaily.getData().clear();
