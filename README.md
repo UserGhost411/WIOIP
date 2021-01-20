@@ -1,6 +1,9 @@
 # WIOIP
 WIOIP atau Weather Information over Internet Protocol adalah suatu software simple yg berguna untuk mendapatkan data cuaca dari internet dan ditulis dalam bahasa Java dengan library JavaFX.
 
+## Kelompok
+Rhevindra Permata Anggriawan	1204190073
+
 ## Library 
 This script requires the following installed:
  - JavaFX
