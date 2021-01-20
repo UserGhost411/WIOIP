@@ -3,7 +3,7 @@ WIOIP atau Weather Information over Internet Protocol adalah suatu software simp
 
 ## Kelompok
 Rhevindra Permata Anggriawan	1204190073
-
+Dharmansyah ade pratama         1204190057
 ## Library 
 This script requires the following installed:
  - JavaFX
