@@ -8,6 +8,8 @@ Dharmansyah ade pratama         1204190057
 
 Firdaus Ilham Dharmawan			1204190003
 
+Erwin Pujianto			1204190038
+
 ## Library 
 This script requires the following installed:
  - JavaFX
