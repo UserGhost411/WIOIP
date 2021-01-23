@@ -31,16 +31,13 @@ public class MainController {
     @FXML LineChart<String,Number> charthourly;
     @FXML LineChart<String,Number> chartdaily;
     @FXML ImageView imgweather;
-    @FXML
-    public void initialize() {
+    @FXML public void initialize() {
         refreshdata();
     }
-    @FXML
-    public void handleClose(){
+    @FXML public void handleClose(){
         Platform.exit();
     }
-    @FXML
-    public void handleRefresh(){
+    @FXML public void handleRefresh(){
         refreshdata();
     }
     @FXML
@@ -128,9 +125,7 @@ public class MainController {
             return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         }
         @Override
-        public void writeImage(BufferedImage img, TranscoderOutput to) throws TranscoderException {
-            this.img = img;
-        }
+        public void writeImage(BufferedImage img, TranscoderOutput to) throws TranscoderException { this.img = img; }
         public BufferedImage getBufferedImage() {
             return img;
         }

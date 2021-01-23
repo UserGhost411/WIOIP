@@ -9,9 +9,6 @@
 <AnchorPane prefHeight="290.0" prefWidth="447.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.AboutController">
    <children>
       <ImageView fx:id="imgbg" fitHeight="122.0" fitWidth="447.0" pickOnBounds="true" preserveRatio="true">
-         <image >
-            <Image url="/img/bg.png" />
-         </image>
       </ImageView>
       <Label alignment="CENTER" layoutY="58.0" prefHeight="37.0" prefWidth="447.0" text="Weather Information" textAlignment="CENTER" textFill="WHITE">
          <font>
@@ -29,14 +26,14 @@
          </font>
       </Label>
       <Label layoutX="126.0" layoutY="155.0" prefHeight="17.0" prefWidth="193.0" text="Firdaus ilham" />
-      <Label layoutX="126.0" layoutY="172.0" prefHeight="17.0" prefWidth="193.0" text="UserGhost411" />
+      <Label layoutX="126.0" layoutY="172.0" prefHeight="17.0" prefWidth="193.0" text="Mashedi" />
       <Label layoutX="126.0" layoutY="190.0" prefHeight="17.0" prefWidth="193.0" text="Erwin pujianto" />
       <Label layoutX="126.0" layoutY="208.0" prefHeight="17.0" prefWidth="193.0" text="Dharmansyah a" />
       <Label layoutX="126.0" layoutY="226.0" prefHeight="17.0" prefWidth="193.0" text="Rhevindra p.a" />
       <Label layoutX="126.0" layoutY="244.0" prefHeight="17.0" prefWidth="193.0" text="Tyrela disya" />
       <Label layoutX="126.0" layoutY="261.0" prefHeight="17.0" prefWidth="193.0" text="Dinda rahmawati" />
       <Label layoutX="243.0" layoutY="155.0" prefHeight="17.0" prefWidth="193.0" text="1204190003" />
-      <Label layoutX="243.0" layoutY="172.0" prefHeight="17.0" prefWidth="193.0" text="---------" />
+      <Label layoutX="243.0" layoutY="172.0" prefHeight="17.0" prefWidth="193.0" text="1204190010" />
       <Label layoutX="243.0" layoutY="190.0" prefHeight="17.0" prefWidth="193.0" text="1204190038" />
       <Label layoutX="243.0" layoutY="208.0" prefHeight="17.0" prefWidth="193.0" text="1204190057" />
       <Label layoutX="243.0" layoutY="226.0" prefHeight="17.0" prefWidth="193.0" text="1204190073" />
