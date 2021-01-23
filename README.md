@@ -12,6 +12,8 @@ WIOIP atau Weather Information over Internet Protocol adalah suatu software simp
 
 [@Dindarah](https://github.com/Dindarah) Dinda Rahmawati   1204192062
 
+[@tyreladisyaa](https://github.com/tyreladisyaa) Tyrela Disya Arivani   1204190068
+
 ## Library 
 This script requires the following installed:
  - JavaFX
