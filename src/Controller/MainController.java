@@ -41,6 +41,20 @@ public class MainController {
         refreshdata();
     }
     @FXML
+    public void handleSetting() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Settings.fxml"));
+        AnchorPane page = (AnchorPane) loader.load();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("WIOIP About");
+        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        Scene scene = new Scene(page);
+        dialogStage.setScene(scene);
+        SettingsController controller = loader.getController();
+        controller.setDialogStage(dialogStage);
+        dialogStage.showAndWait();
+    }
+    @FXML
     public void handleAbout() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/About.fxml"));
         AnchorPane page = (AnchorPane) loader.load();
@@ -75,27 +89,27 @@ public class MainController {
         try { d = new Requester().requestget("https://weatherextension.com/api/v2/weather/location"); } catch (IOException e) { e.printStackTrace(); }
 
         JSONObject jsonObject = new JSONObject(d.replace("\\u00b0", ""));
-
+        System.out.println(jsonObject);
         String icon = jsonObject.getJSONObject("weather").getJSONObject("currently").getString("iconv2").replace("wi ","").trim();
         lbl_place.setText(jsonObject.getJSONObject("currentLocation").getString("location_name"));
         JSONObject current = jsonObject.getJSONObject("weather").getJSONObject("currently");
         lbl_summary.setText(current.getString("summary"));
         lbl_temp.setText(""+(Integer.parseInt(current.getString("temperature"))- 32) * 5/9);
         lbl_humidity.setText("Humidity : "+current.getInt("humidity")+"%");
-        lbl_wind.setText("Wind Speed : "+current.getString("windSpeed"));
-        lbl_press.setText("Pressure : "+current.getInt("pressure")+" mb");
+        lbl_wind.setText("Wind Speed : "+current.getInt("windSpeed"));
+        lbl_press.setText("Pressure : "+current.get("pressure").toString()+" mb");
         lbl_upd.setText("Last Update : "+new SimpleDateFormat("HH:mm").format(new Date()));
         for (Object a : jsonObject.getJSONObject("weather").getJSONObject("daily").getJSONArray("data")) {
             JSONObject hasil = new JSONObject(a.toString());
             D_windSpeed.getData().add(new XYChart.Data(hasil.getString("time"),hasil.getInt("windSpeed")));
-            D_tempsH.getData().add(new XYChart.Data(hasil.getString("time"), (hasil.getInt("temperatureHigh")- 32) * 5/9));
-            D_tempsL.getData().add(new XYChart.Data(hasil.getString("time"), (hasil.getInt("temperatureLow")- 32) * 5/9));
+            D_tempsH.getData().add(new XYChart.Data(hasil.getString("time"), (Integer.parseInt(hasil.getString("temperatureMax")) - 32) * 5/9));
+            D_tempsL.getData().add(new XYChart.Data(hasil.getString("time"), (Integer.parseInt(hasil.getString("temperatureMin"))- 32) * 5/9));
             D_rainChance.getData().add(new XYChart.Data(hasil.getString("time"), Integer.parseInt(hasil.getString("precipProbability").replace("%",""))));
         }
         for (Object a : jsonObject.getJSONObject("weather").getJSONObject("hourly").getJSONArray("data")) {
             JSONObject hasil = new JSONObject(a.toString());
             H_windSpeed.getData().add(new XYChart.Data(hasil.getString("time"),hasil.getInt("windSpeed")));
-            H_temps.getData().add(new XYChart.Data(hasil.getString("time"), (hasil.getInt("temperature")- 32) * 5/9));
+            H_temps.getData().add(new XYChart.Data(hasil.getString("time"), (Integer.parseInt(hasil.getString("temperature"))- 32) * 5/9));
             H_rainChance.getData().add(new XYChart.Data(hasil.getString("time"), Integer.parseInt(hasil.getString("precipProbability").replace("%",""))));
         }
         chartdaily.getData().clear();

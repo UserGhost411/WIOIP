@@ -99,6 +99,7 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#handleRefresh" text="Refresh" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleSetting" text="Setting" />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Exit" />
             </items>

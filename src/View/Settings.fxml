@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="339.0" prefWidth="556.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.SettingsController">
+
+                     <children>
+                        <TableView fx:id="TableLocation" layoutX="14.0" layoutY="14.0" prefHeight="258.0" prefWidth="413.0">
+                           <columns>
+                              <TableColumn fx:id="cityCol" prefWidth="188.0" text="City Name" />
+                              <TableColumn fx:id="defCol" minWidth="0.0" prefWidth="84.0" text="is Default" />
+                              <TableColumn fx:id="addedCol" minWidth="0.0" prefWidth="125.0" text="Added" />
+                           </columns>
+                        </TableView>
+                        <Button layoutX="443.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleAdd" prefHeight="28.0" prefWidth="90.0" text="Add City" />
+                        <Button layoutX="443.0" layoutY="86.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="28.0" prefWidth="90.0" text="Delete" />
+                        <Button layoutX="443.0" layoutY="244.0" mnemonicParsing="false" onAction="#handleDefault" prefHeight="28.0" prefWidth="90.0" text="Set Default" />
+
+                     </children>
+                  </AnchorPane>
+
