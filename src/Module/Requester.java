@@ -36,32 +36,7 @@ public class Requester {
     public Requester(){
         idnya = lastid(5);
     }
-    public void sendboi(String myurl) throws IOException{
-        InputStream is = null;
-        int length = 999999;
-        try {
-            URL url = new URL(myurl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(1000 * 10 /* milliseconds */);
-            conn.setConnectTimeout(1000 * 15 /* milliseconds */);
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("appid","5ff8331b"+idnya);
-            conn.setRequestProperty("user-agent","Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
-            conn.setRequestProperty("weather-version","5.0.7");
-            conn.setRequestProperty("accept-encoding","");
-            conn.setRequestProperty("accept-language","id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7");
-            conn.setRequestMethod("OPTIONS");
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            conn.connect();
-            int response = conn.getResponseCode();
-            //if(response!=200)return "{\"status\":\""+response+"\",\"data\":\""+ convertInputStreamToString(conn.getErrorStream(), length)+"\"}";
-            is = conn.getInputStream();
-            //return convertInputStreamToString(is, length);
-        } finally {
-            if (is != null) is.close();
-        }
-    }
+
     private String getsend(String myurl, int rto, int cto) throws IOException {
         InputStream is = null;
         int length = 999999;
@@ -102,7 +77,6 @@ public class Requester {
             conn.setConnectTimeout(1000 * cto /* milliseconds */);
             conn.setRequestProperty("appid","5ff8331b"+idnya);
             conn.setRequestMethod("POST");
-
             conn.setDoInput(true);
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(data);
@@ -116,7 +90,6 @@ public class Requester {
             if (is != null) is.close();
         }
     }
-
     public String convertInputStreamToString(InputStream stream, int length) throws IOException, UnsupportedEncodingException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder sb = new StringBuilder();

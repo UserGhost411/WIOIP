@@ -1,6 +1,5 @@
 package Module;
-
-import org.json.JSONObject;
+import org.json.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,7 +63,7 @@ public class Configuration {
             if (!myObj.exists()) {
                 myObj.createNewFile();
                 FileWriter myWriter = new FileWriter(fn);
-                myWriter.write("{\"setting\":{\"unit\":\"C\"},\"locations\":[{\"city\":\"surabaya\",\"default\":true,\"added\":\"19/01/2021\"}]}");
+                myWriter.write("{\"setting\"{\"unit\":\"C\"},\"locations\":[{\"city\":\"surabaya\",\"default\":true,\"added\":\"19/01/2021\"}]}");
                 myWriter.close();
             }
         } catch (IOException e) {

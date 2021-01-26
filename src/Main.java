@@ -8,7 +8,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/View/Main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/View/Main1.fxml"));
         primaryStage.setTitle("Weather Information Over Internet Protocol");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);

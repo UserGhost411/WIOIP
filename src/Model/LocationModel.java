@@ -1,7 +1,6 @@
 package Model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 public class LocationModel {
     private StringProperty city,loc;
     public LocationModel(String city, String loc){

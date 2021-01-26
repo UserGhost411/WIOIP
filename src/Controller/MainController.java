@@ -1,124 +1,326 @@
 package Controller;
 
+import Model.weatherDailyModel;
+import Module.Configuration;
 import Module.Requester;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
-import org.json.*;
-import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import org.json.JSONObject;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainController {
-    @FXML Label lbl_place,lbl_summary,lbl_temp,lbl_humidity,lbl_wind,lbl_press,lbl_upd;
-    @FXML LineChart<String,Number> charthourly;
-    @FXML LineChart<String,Number> chartdaily;
-    @FXML ImageView imgweather;
-    @FXML public void initialize() { refreshdata(); }
-    @FXML public void handleClose(){
+    // register semua component pada form main
+    @FXML Label lbl_date,lbl_temp,lbl_unit,lbl_place,lbl_feels,lbl_update,lbl_weather,lbl_air,lbl_uv;
+    @FXML ImageView icon,bg,iv_about,iv_setting;
+    @FXML ListView<String> lv_city;
+    @FXML ProgressIndicator pb_loading;
+    @FXML ProgressBar prog_uv,prog_air;
+    @FXML private TableView<weatherDailyModel> tbl_daily;
+    @FXML private TableColumn<weatherDailyModel,String> DimgCol;
+    @FXML private TableColumn<weatherDailyModel,String> DdateCol;
+    @FXML private TableColumn<weatherDailyModel,String> DtempCol;
+    @FXML private TableColumn<weatherDailyModel,String> DwindCol;
+    @FXML private TableColumn<weatherDailyModel,String> DhumCol;
+
+    @FXML private TableView<weatherDailyModel> tbl_weekly;
+    @FXML private TableColumn<weatherDailyModel,String> WimgCol;
+    @FXML private TableColumn<weatherDailyModel,String> WdateCol;
+    @FXML private TableColumn<weatherDailyModel,String> WtempCol;
+    @FXML private TableColumn<weatherDailyModel,String> WwindCol;
+    @FXML private TableColumn<weatherDailyModel,String> WhumCol;
+
+    //===================================================================
+    private ObservableList<weatherDailyModel> weatherweeklydata  = FXCollections.observableArrayList();
+    private ObservableList<weatherDailyModel> weatherdailydata  = FXCollections.observableArrayList();
+
+    //menginisialisasi TableColumn pada Tableview dan memuat data
+    @FXML private void initialize() {
+        DdateCol.setCellValueFactory(cellData -> cellData.getValue().DateProperty());
+        DtempCol.setCellValueFactory(cellData -> cellData.getValue().TempProperty());
+        DwindCol.setCellValueFactory(cellData -> cellData.getValue().WindProperty());
+        DhumCol.setCellValueFactory(cellData -> cellData.getValue().HumProperty());
+        WdateCol.setCellValueFactory(cellData -> cellData.getValue().DateProperty());
+        WtempCol.setCellValueFactory(cellData -> cellData.getValue().TempProperty());
+        WwindCol.setCellValueFactory(cellData -> cellData.getValue().WindProperty());
+        WhumCol.setCellValueFactory(cellData -> cellData.getValue().HumProperty());
+        refreshdata();
+        iv_setting.setImage(svgset("/img/icon/gear.svg"));
+        iv_about.setImage(svgset("/img/icon/info.svg"));
+        double y_about = iv_about.getX();
+        iv_setting.setSmooth(true);
+        TranslateTransition translation = new TranslateTransition(Duration.seconds(0.1), iv_about);
+        translation.interpolatorProperty().set(Interpolator.SPLINE(.1, .1, .3, .3));
+        translation.setByY(-10);
+        translation.setAutoReverse(true);
+        translation.setCycleCount(2);
+        RotateTransition rotation = new RotateTransition(Duration.seconds(0.5), iv_setting);
+        rotation.setCycleCount(Animation.INDEFINITE);
+        rotation.setByAngle(180);
+        iv_setting.setOnMouseEntered(e -> rotation.play());
+        iv_setting.setOnMouseExited(e -> rotation.pause());
+        iv_about.setOnMouseEntered(e -> translation.play());
+    }
+    @FXML private void handleClose(){
         Platform.exit();
     }
-    @FXML public void handleRefresh(){
-        refreshdata();
-    }
-    @FXML
-    public void handleSetting() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Settings.fxml"));
-        AnchorPane page = (AnchorPane) loader.load();
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("WIOIP About");
-        dialogStage.initStyle(StageStyle.UTILITY);
-        dialogStage.initModality(Modality.WINDOW_MODAL);
-        Scene scene = new Scene(page);
-        dialogStage.setScene(scene);
-        SettingsController controller = loader.getController();
-        controller.setDialogStage(dialogStage);
-        dialogStage.showAndWait();
-    }
-    @FXML
-    public void handleAbout() throws IOException {
+    @FXML private void handleRefresh(){ refreshdata(); }
+    //Handle click pada about
+    @FXML private void handleAbout() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/About.fxml"));
         AnchorPane page = (AnchorPane) loader.load();
         Stage dialogStage = new Stage();
         dialogStage.setTitle("WIOIP About");
         dialogStage.initStyle(StageStyle.UTILITY);
         dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setResizable(false);
         Scene scene = new Scene(page);
         dialogStage.setScene(scene);
         AboutController controller = loader.getController();
         controller.setDialogStage(dialogStage);
         dialogStage.showAndWait();
     }
-    public void refreshdata(){
-        XYChart.Series<String, Number> D_tempsH = new XYChart.Series<>();
-        XYChart.Series<String, Number> D_tempsL = new XYChart.Series<>();
-        XYChart.Series<String, Number> D_windSpeed = new XYChart.Series<>();
-        XYChart.Series<String, Number> D_rainChance = new XYChart.Series<>();
-        XYChart.Series<String, Number> H_temps = new XYChart.Series<>();
-        XYChart.Series<String, Number> H_windSpeed = new XYChart.Series<>();
-        XYChart.Series<String, Number> H_rainChance = new XYChart.Series<>();
-        D_tempsH.setName("Highest Temperature");
-        D_tempsL.setName("Lowest Temperature");
-        D_windSpeed.setName("wind Speed");
-        D_rainChance.setName("Rain Chance");
-        H_temps.setName("Temperature");
-        H_windSpeed.setName("wind Speed");
-        H_rainChance.setName("Rain Chance");
-        chartdaily.setAnimated(true);
-        charthourly.setAnimated(true);
-        String d = null;
-        try { d = new Requester().requestget("https://weatherextension.com/api/v2/weather/location"); } catch (IOException e) { e.printStackTrace(); }
-        JSONObject jsonObject = new JSONObject(d.replace("\\u00b0", ""));
-        String icon = jsonObject.getJSONObject("weather").getJSONObject("currently").getString("iconv2").replace("wi ","").trim();
-        lbl_place.setText(jsonObject.getJSONObject("currentLocation").getString("location_name"));
-        JSONObject current = jsonObject.getJSONObject("weather").getJSONObject("currently");
-        lbl_summary.setText(current.getString("summary"));
-        lbl_temp.setText(""+(Integer.parseInt(current.getString("temperature"))- 32) * 5/9);
-        lbl_humidity.setText("Humidity : "+current.get("humidity").toString()+"%");
-        lbl_wind.setText("Wind Speed : "+current.get("windSpeed").toString());
-        lbl_press.setText("Pressure : "+current.get("pressure").toString()+" mb");
-        lbl_upd.setText("Last Update : "+new SimpleDateFormat("HH:mm").format(new Date()));
-        for (Object a : jsonObject.getJSONObject("weather").getJSONObject("daily").getJSONArray("data")) {
-            JSONObject hasil = new JSONObject(a.toString());
-            D_windSpeed.getData().add(new XYChart.Data(hasil.getString("time"),hasil.getInt("windSpeed")));
-            D_tempsH.getData().add(new XYChart.Data(hasil.getString("time"), (Integer.parseInt(hasil.getString("temperatureMax")) - 32) * 5/9));
-            D_tempsL.getData().add(new XYChart.Data(hasil.getString("time"), (Integer.parseInt(hasil.getString("temperatureMin"))- 32) * 5/9));
-            D_rainChance.getData().add(new XYChart.Data(hasil.getString("time"), Integer.parseInt(hasil.getString("precipProbability").replace("%",""))));
-        }
-        for (Object a : jsonObject.getJSONObject("weather").getJSONObject("hourly").getJSONArray("data")) {
-            JSONObject hasil = new JSONObject(a.toString());
-            H_windSpeed.getData().add(new XYChart.Data(hasil.getString("time"),hasil.getInt("windSpeed")));
-            H_temps.getData().add(new XYChart.Data(hasil.getString("time"), (Integer.parseInt(hasil.getString("temperature"))- 32) * 5/9));
-            H_rainChance.getData().add(new XYChart.Data(hasil.getString("time"), Integer.parseInt(hasil.getString("precipProbability").replace("%",""))));
-        }
-        chartdaily.getData().clear();
-        charthourly.getData().clear();
-        chartdaily.getData().add(D_windSpeed);
-        chartdaily.getData().add(D_tempsH);
-        chartdaily.getData().add(D_tempsL);
-        chartdaily.getData().add(D_rainChance);
-        charthourly.getData().add(H_windSpeed);
-        charthourly.getData().add(H_temps);
-        charthourly.getData().add(H_rainChance);
-        svgset("/img/"+icon+".svg");
+    //Handle click pada setting
+    @FXML private void handleSetting() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Settings.fxml"));
+        AnchorPane page = (AnchorPane) loader.load();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("WIOIP Place Settings");
+        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setResizable(false);
+        Scene scene = new Scene(page);
+        dialogStage.setScene(scene);
+        SettingsController controller = loader.getController();
+        controller.setDialogStage(dialogStage);
+        controller.openTab(0);
+        dialogStage.showAndWait();
+        refreshdata();
     }
+    //Handle click pada add city
+    @FXML private void handleLocations() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Settings.fxml"));
+        AnchorPane page = (AnchorPane) loader.load();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("WIOIP Place Settings");
+        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setResizable(false);
+        Scene scene = new Scene(page);
+        dialogStage.setScene(scene);
+        SettingsController controller = loader.getController();
+        controller.setDialogStage(dialogStage);
+        controller.openTab(1);
+        dialogStage.showAndWait();
+        refreshdata();
+    }
+    //Handle click pada listview kota
+    @FXML private void handleMouseClick(MouseEvent arg0) throws IOException {
+        //double click yak
+        if(arg0.getClickCount()==2){
+            //dapatkan kota yg di click
+            String cityselected = lv_city.getSelectionModel().getSelectedItem();
+            Configuration cfg = new Configuration();
+            JSONObject d = cfg.getSetting();
+            //load kota yg di click kedalam default
+            for (int i = 0; i < d.getJSONArray("locations").length(); i++) {
+                boolean samecity = d.getJSONArray("locations").getJSONObject(i).getString("city").equalsIgnoreCase(cityselected);
+                d.getJSONArray("locations").getJSONObject(i).put("default",samecity );
+            }
+            //simpan localconfig
+            cfg.setSetting(d);
+            //muat ulang data
+            refreshdata();
+        }
+    }
+    private void refreshdata() {
+        //bersihkan semua TableView
+        tbl_daily.getItems().clear();
+        tbl_weekly.getItems().clear();
+        //Set BG (biar gk keliatan kosong saat Run awal / loading)
+        if (bg.getImage()==null) setbg("13n");
+        Configuration cfg = new Configuration();
+        //buat list dari kota yg terdapat di localconfig
+        ObservableList<String> items = FXCollections.observableList(cfg.getCitys(3));
+        //set item dari list kota2
+        lv_city.setItems(items);
+        //saat nya main main dengan listview
+        lv_city.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            public void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty) {
+                    //kalo kosong , kosongin aja , jangan lupa di transparent yak
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("-fx-background-color: rgba(255, 255, 255, 0);");
+                } else {
+                    //buat container VBOX
+                    VBox hBox = new VBox(5);
+                    hBox.setAlignment(Pos.BOTTOM_CENTER);
+                    //tambahkan imageview dan label
+                    hBox.getChildren().addAll(new ImageView(new Image("https://picsum.photos/100/150", true)), new Label(name));
+                    //set containter kedalam cell listview
+                    setGraphic(hBox);
+                    //jangan lupa TRANSPARENT GAN
+                    setStyle("-fx-background-color: rgba(255, 255, 255, 0);-fx-selection-bar-non-focused: green ;");
+                    }
+            }
+        });
+        //anggap aja loading yekan
+        pb_loading.setVisible(true);
+        new Thread() {
+            public void run() {
+                //Thread Run - > BG Process
+                try {
+                    int timeout = 5000;
+                    InetAddress[] addresses = InetAddress.getAllByName("www.google.com");
+                    for (InetAddress address : addresses) {
+                        if (!address.isReachable(timeout)) {
+                            panggilerror();
+                            return;
+                        }
+                    }
+                }catch (Exception e){ e.printStackTrace(); }
+                Requester rq = new Requester();
+                Configuration cfg = new Configuration();
+                try {
+                    String kota = cfg.getdefaultLocation().getString("city").contains(" ")?cfg.getdefaultLocation().getString("city").substring(0,cfg.getdefaultLocation().getString("city").indexOf(" ")):cfg.getdefaultLocation().getString("city");
+                    //ambil data pada api dan parse
+                    JSONObject firstApi = new JSONObject(rq.requestget("https://wioip-api.herokuapp.com/weather/all/" + kota,20,30));
+                    //ambil data current dan forecast
+                    final JSONObject current = firstApi.getJSONObject("current");
+                    final JSONObject forecast = firstApi.getJSONObject("forecast");
+                    //ambil api dari waqi (untuk UV dan Air Polution)
+                    final JSONObject secondApi = new JSONObject(rq.requestget("https://api.waqi.info/feed/geo:" + current.getJSONObject("coord").getInt("lat") + ";" + current.getJSONObject("coord").getInt("lon") + "/?token=9311857ccf3e488b86121268b016304e3c5ca3b4",20,30));
+                    Platform.runLater(new Runnable() {
+                        //Thread Run -> to javafx form
+                        public void run() {
+                            // check uv dan air polution dari secondAPI
+                            double air_level = secondApi.getJSONObject("data").getJSONObject("iaqi").getJSONObject("pm10").getInt("v");
+                            //udah nilai dalam progressbar (0 sampai 1) - index polusi terburuk pada 200 jadi pakai rumus persentase {air_level}/200*1
+                            prog_air.setProgress((air_level / 200) * 1);
+                            //tampilkan nilai ke label
+                            lbl_air.setText("Air Polution : "+air_level+" AQI");
+                            //ambil data UV dari array forecast dalam 2nd api
+                            for (Object a :  secondApi.getJSONObject("data").getJSONObject("forecast").getJSONObject("daily").getJSONArray("uvi")) {
+                                JSONObject hasil = new JSONObject(a.toString());
+                                //temukan data sesuai tanggal sekarang dong
+                                if(hasil.getString("day").equalsIgnoreCase(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))){
+                                    //found it? , cari rata2 (udah tersedia dalam object)
+                                    double uv_level = hasil.getDouble("avg");
+                                    //tampilkan
+                                    lbl_uv.setText("Index UV : "+uv_level);
+                                    //UV index terparah 11 = udah auto kanker bruh , sama kyk diatas , pake rumus persentase {air_level}/11*1
+                                    prog_uv.setProgress((uv_level / 11) * 1);
+                                }
+                            }
+                            // isi label
+                            String checkloc = firstApi.getString("country").equals(firstApi.getString("region")) ? firstApi.getString("region"):firstApi.getString("region")+", "+firstApi.getString("country");
+                            lbl_place.setText(current.getString("name") + ", " + checkloc);
+                            lbl_temp.setText(String.valueOf(termocheck(current.getJSONObject("main").getInt("temp"))));
+                            lbl_feels.setText("Feels Like "+termocheck(current.getJSONObject("main").getInt("feels_like")));
+                            lbl_update.setText("Update "+new SimpleDateFormat("HH:mm").format(new Date()));
+                            lbl_unit.setText("°"+cfg.getUnits());
+                            lbl_date.setText(new SimpleDateFormat("EEE, d MMM").format(new Date()));
+                            lbl_weather.setText(current.getJSONArray("weather").getJSONObject(0).getString("description"));
+                            //load data ke tableview
+                            List<String> df = new ArrayList<>();
+                            //ambil data list forecast dari first api
+                            for (Object a : forecast.getJSONArray("list")) {
+                                JSONObject hasil = new JSONObject(a.toString());
+                                JSONObject main = hasil.getJSONObject("main");
+                                //checking yak , buat array simple yg nanti akan seleksi tgl berapa aja yg udah masuk (kalo udah masuk , gk perlu masuk lagi)
+                                if(!df.contains(hasil.getString("dt_txt").substring(0,10))){
+                                    //parse data kedalam model
+                                    weatherweeklydata.add(new weatherDailyModel("",hasil.getString("dt_txt").substring(0,10),termocheck(main.getInt("temp"))+" "+cfg.getUnits(),hasil.getJSONObject("wind").getDouble("speed")+" Kmph",main.getInt("humidity")+"%"));
+                                    //ok tgl ini telah masuk , ayo kita siapkan kedalam selector (biar ak masuk lagi - duplicate day)
+                                    df.add(hasil.getString("dt_txt").substring(0,10));
+                                }
+                                //cari tanggal yg sama untuk data harian dong (beda nya terdapat data di tiap jam)
+                                if(hasil.getString("dt_txt").startsWith(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))) {
+                                    //parse data kedalam model
+                                    weatherdailydata.add(new weatherDailyModel("",hasil.getString("dt_txt"),termocheck(main.getInt("temp"))+" "+cfg.getUnits(),hasil.getJSONObject("wind").getDouble("speed")+" Kmph",main.getInt("humidity")+"%"));
+                                }
+                            }
+                            //data udah diparsekan , saat nya memuat data dari model kedalam tableview
+                            tbl_weekly.setItems(weatherweeklydata);
+                            tbl_daily.setItems(weatherdailydata);
+                            //ubah icon dan background berdasarkan api
+                            icon.setImage(svgset("/img/icon/" + geticon(current.getJSONArray("weather").getJSONObject(0).getString("description"))));
+                            setbg(current.getJSONArray("weather").getJSONObject(0).getString("icon"));
+                            //dah loading selesai
+                            pb_loading.setVisible(false);
+                        }
+                    });
+                }catch (Exception e){e.printStackTrace();}
+            }
+        }.start();
+    }
+    private void panggilerror(){
+        Platform.runLater(new Runnable() {
+            //Thread Run -> to javafx form
+            public void run() {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Error.fxml"));
+                AnchorPane page = null;
+                try {
+                    page = (AnchorPane) loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Stage dialogStage = new Stage();
+                dialogStage.setTitle("WIOIP TIC TAC TOE");
+                dialogStage.initStyle(StageStyle.UTILITY);
+                dialogStage.initModality(Modality.WINDOW_MODAL);
+                Scene scene = new Scene(page);
+                dialogStage.setScene(scene);
+                ErrorController controller = loader.getController();
+                controller.setDialogStage(dialogStage);
+                dialogStage.showAndWait();
+            }});
+    }
+    //Memuat Background pada aplikasi
+    private void setbg(String wa){
+        bg.setImage(new Image("img/bg/" + getbg(wa)));
+        bg.setPreserveRatio(true);
+        //color adjust = biar bg nya agak gelap dikit (tulisan yg putih soalnya hehe)
+        ColorAdjust colorAdjust = new ColorAdjust();
+        colorAdjust.setBrightness(-0.3);
+        bg.setEffect(colorAdjust);
+    }
+    //merender file svg menjadi Image dengan bantuan class Transcoder
     private Image svgset(String path){
         BufferedImageTranscoder transcoder = new BufferedImageTranscoder();
         try (InputStream file = getClass().getResourceAsStream(path)) {
@@ -131,6 +333,86 @@ public class MainController {
         } catch (IOException io) { io.printStackTrace(); }
         return null;
     }
+    //mengubah suhu C to F dan sebalikanya
+    private int termocheck(int h){
+        Configuration cfg = new Configuration();
+        //dev awal mles check suhu dari api apakah c or f (dengan offset 50c itu panas banget dan 50f itu dingin tapi gk beku)
+        if(h>50){
+            return (cfg.getUnits().equals("C"))?((h- 32) * 5/9):h;
+        }else{
+            return (cfg.getUnits().equals("C"))?h:((h*9/5) + 32);
+        }
+    }
+    //mendapatkan bg berdasarkan nomor IP
+    private String getbg(String w){
+        switch (w) {
+            case "01d":
+                return "Clear-Sky-Day-3.jpg";
+            case "01n":
+                return "Clear-Sky-Night.jpg";
+            case "02d":
+                return "Partly-Cloudy-Day.jpg";
+            case "02n":
+                return "Partly-Cloudy-Night.jpg";
+            case "03d":
+                return "Scattered-Clouds.jpg";
+            case "03n":
+                return "Scattered-Clouds-Night.jpg";
+            case "04d":
+                return "Broken-Clouds-Day.jpg";
+            case "04n":
+                return "Broken-Clouds-Night.jpg";
+            case "09d":
+                return "Shower-Rain-Day.jpg";
+            case "09n":
+                return "Shower-Rain-Night.jpg";
+            case "10d":
+                return "Rain-Day.jpg";
+            case "10n":
+                return "Rain-Night.jpg";
+            case "11d":
+                return "Thunderstorm-Day.jpg";
+            case "11n":
+                return "Thunderstorm-Night.jpg";
+            case "13d":
+                return "Snow-Day.jpg";
+            case "13n":
+                return "Snow-Night.jpg";
+            case "50d":
+                return "Mist-Day.jpg";
+            case "50n":
+                return "Mist-Night.jpg";
+            default:
+                return "Clear-Sky-Day-3.jpg";
+        }
+    }
+    //mendapatkan icon berdasarkan deksripsi
+    public String geticon(String w){
+        if(w.contains("clear sky")){
+            return "clear-sky-o.svg";
+        }else if(w.contains("few clouds")){
+            return "few-clouds-o.svg";
+        }else if(w.contains("scattered clouds")){
+            return "Shape_11.svg";
+        }else if(w.contains("broken clouds")){
+            return "Shape_11.svg";
+        }else if(w.contains("shower rain")){
+            return "shower-rain-o.svg";
+        }else if(w.contains("rain")){
+            return "rain-o.svg";
+        }else if(w.contains("thunderstorm")){
+            return "thunderstorm-o.svg";
+        }else if(w.contains("snow")){
+            return "snowflake-o.svg";
+        }else if(w.contains("mist")){
+            return "mist-o.svg";
+        }else if(w.contains("overcast clouds")){
+            return "Shape_11.svg";
+        }else{
+            return "clear-sky-o.svg";
+        }
+    }
+    //class khusus untuk memuat svg ke Image
     public class BufferedImageTranscoder extends ImageTranscoder {
         private BufferedImage img = null;
         @Override public BufferedImage createImage(int width, int height) { return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }

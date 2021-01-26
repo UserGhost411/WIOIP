@@ -15,9 +15,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.json.JSONObject;
-
 import java.io.FileNotFoundException;
-
 public class SettingsController {
     private Stage dialogStage;
     public void setDialogStage(Stage dialogStage){ this.dialogStage = dialogStage; }
@@ -26,12 +24,27 @@ public class SettingsController {
     @FXML private TableColumn<PlaceModel,String> cityCol;
     @FXML private TableColumn<PlaceModel,String> defCol;
     @FXML private TableColumn<PlaceModel,String> addedCol;
+    @FXML ChoiceBox opt_temp;
+    @FXML TabPane tab_panel;
     private ObservableList<PlaceModel> PlaceData = FXCollections.observableArrayList();
+
     //menginisialisasi TableColumn pada Tableview dan memuat data
     @FXML public void initialize() {
         cityCol.setCellValueFactory(cellData -> cellData.getValue().CityProperty());
         defCol.setCellValueFactory(cellData -> cellData.getValue().DefProperty());
         addedCol.setCellValueFactory(cellData -> cellData.getValue().AddedProperty());
+        opt_temp.setItems(FXCollections.observableArrayList("Celcius", "Fahrenheit"));
+        opt_temp.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                Configuration cfg = new Configuration();
+                try {
+                    JSONObject stg = cfg.getSetting();
+                    stg.getJSONObject("setting").put("unit", (newValue.intValue()==1) ? "F" : "C");
+                    cfg.setSetting(stg);
+                }catch (Exception e){ e.printStackTrace(); }
+            }
+        });
         readdata();
     }
     @FXML
@@ -42,6 +55,7 @@ public class SettingsController {
         Stage dialogStage = new Stage();
         //window
         dialogStage.setTitle("Add Location");
+        //
         dialogStage.initStyle(StageStyle.UTILITY);
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
@@ -118,6 +132,7 @@ public class SettingsController {
             d.getJSONArray("locations").remove(selectID);
             //simpan config
             cfg.setSetting(d);
+
         }else {
             //belum pilih item di tableview
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -126,6 +141,9 @@ public class SettingsController {
             alert.setContentText("Please select data from table");
             alert.showAndWait();
         }
+    }
+    public void openTab(int i){
+        tab_panel.getSelectionModel().select(i);
     }
     private void readdata(){
         //bersihkan tableview location
@@ -137,9 +155,11 @@ public class SettingsController {
                 //masukan data dari localconfig ke model
                 PlaceData.add(new PlaceModel(haa.getString("city"),haa.getString("added"),String.valueOf(haa.getBoolean("default"))));
             }
+            opt_temp.getSelectionModel().select(cfg.getUnits().equals("C")?0:1);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
         //masukan semua item dalam model kedalam tableview
         TableLocation.setItems(PlaceData);
     }

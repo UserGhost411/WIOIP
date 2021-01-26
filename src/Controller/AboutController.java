@@ -7,13 +7,12 @@ import javafx.stage.Stage;
 
 public class AboutController {
     private Stage dialogStage;
-    public void setDialogStage(Stage dialogStage){
-        this.dialogStage = dialogStage;
-    }
+    public void setDialogStage(Stage dialogStage){ this.dialogStage = dialogStage; }
+    // register semua component pada form About
     @FXML ImageView imgbg;
-    @FXML
-    public void initialize() {
-        imgbg.setImage(new Image("/img/bg.png"));
+    //menginisialisasi image dan set rasio nya
+    @FXML public void initialize() {
+        imgbg.setImage(new Image("/img/bg/bg.png"));
         imgbg.setPreserveRatio(false);
     }
 }

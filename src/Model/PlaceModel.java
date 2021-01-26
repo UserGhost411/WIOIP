@@ -1,11 +1,10 @@
 package Model;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class PlaceModel {
     private StringProperty city,added,def;
-    public PlaceModel(String city, String added, String def){
+    public PlaceModel(String city, String added,String def){
         this.city = new SimpleStringProperty(city);
         this.added = new SimpleStringProperty(added);
         this.def = new SimpleStringProperty(def);
