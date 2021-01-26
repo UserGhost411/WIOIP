@@ -83,18 +83,16 @@ public class MainController {
         H_rainChance.setName("Rain Chance");
         chartdaily.setAnimated(true);
         charthourly.setAnimated(true);
-        String d = null;///http://ip-api.com/json/");
+        String d = null;
         try { d = new Requester().requestget("https://weatherextension.com/api/v2/weather/location"); } catch (IOException e) { e.printStackTrace(); }
-
         JSONObject jsonObject = new JSONObject(d.replace("\\u00b0", ""));
-        System.out.println(jsonObject);
         String icon = jsonObject.getJSONObject("weather").getJSONObject("currently").getString("iconv2").replace("wi ","").trim();
         lbl_place.setText(jsonObject.getJSONObject("currentLocation").getString("location_name"));
         JSONObject current = jsonObject.getJSONObject("weather").getJSONObject("currently");
         lbl_summary.setText(current.getString("summary"));
         lbl_temp.setText(""+(Integer.parseInt(current.getString("temperature"))- 32) * 5/9);
-        lbl_humidity.setText("Humidity : "+current.getInt("humidity")+"%");
-        lbl_wind.setText("Wind Speed : "+current.getInt("windSpeed"));
+        lbl_humidity.setText("Humidity : "+current.get("humidity").toString()+"%");
+        lbl_wind.setText("Wind Speed : "+current.get("windSpeed").toString());
         lbl_press.setText("Pressure : "+current.get("pressure").toString()+" mb");
         lbl_upd.setText("Last Update : "+new SimpleDateFormat("HH:mm").format(new Date()));
         for (Object a : jsonObject.getJSONObject("weather").getJSONObject("daily").getJSONArray("data")) {
@@ -119,15 +117,19 @@ public class MainController {
         charthourly.getData().add(H_windSpeed);
         charthourly.getData().add(H_temps);
         charthourly.getData().add(H_rainChance);
+        svgset("/img/"+icon+".svg");
+    }
+    private Image svgset(String path){
         BufferedImageTranscoder transcoder = new BufferedImageTranscoder();
-        try (InputStream file = getClass().getResourceAsStream("/img/"+icon+".svg")) {
+        try (InputStream file = getClass().getResourceAsStream(path)) {
             TranscoderInput transIn = new TranscoderInput(file);
             try {
                 transcoder.transcode(transIn, null);
                 Image img = SwingFXUtils.toFXImage(transcoder.getBufferedImage(), null);
-                imgweather.setImage(img);
+                return img;
             } catch (TranscoderException ex) { ex.printStackTrace(); }
         } catch (IOException io) { io.printStackTrace(); }
+        return null;
     }
     public class BufferedImageTranscoder extends ImageTranscoder {
         private BufferedImage img = null;

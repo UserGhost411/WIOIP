@@ -120,7 +120,6 @@ public class Requester {
     public String convertInputStreamToString(InputStream stream, int length) throws IOException, UnsupportedEncodingException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder sb = new StringBuilder();
-
         String line = null;
         try {
             while ((line = reader.readLine()) != null) {
