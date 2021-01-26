@@ -54,10 +54,9 @@ public class Configuration {
                 JSONObject haa = new JSONObject(a.toString());
                 if(tmp.size()<max) tmp.add(haa.getString("city"));
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return tmp;
+            return tmp;
+        } catch (FileNotFoundException e) { e.printStackTrace(); }
+        return null;
     }
     public void checkfile(String fn){
         try {
