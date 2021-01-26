@@ -113,7 +113,7 @@
                         <Font name="Arial" size="13.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="13.0" layoutY="370.0" prefHeight="79.0" prefWidth="109.0" style="-fx-background-color: rgba(15,157,88,1);" text="0 - 50&#10;Good&#10;" textAlignment="CENTER" textFill="WHITE" />
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="13.0" layoutY="370.0" prefHeight="79.0" prefWidth="109.0" style="-fx-background-color: rgba(15,157,88,1);" text="0 - 50&#10;Good&#10;" textAlignment="CENTER" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="13.0" layoutY="286.0" prefHeight="79.0" prefWidth="109.0" style="-fx-background-color: rgba(255,222,51,1);" text="51 - 100&#10;Moderate&#10;" textAlignment="CENTER" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="13.0" layoutY="201.0" prefHeight="79.0" prefWidth="109.0" style="-fx-background-color: rgba(255,153,51,1);" text="101 - 150&#10;Unhealthy limit&#10;" textAlignment="CENTER" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="117.0" prefHeight="79.0" prefWidth="109.0" style="-fx-background-color: rgba(204,0,51,1);" text="151- 200&#10;Unhealthy&#10;" textAlignment="CENTER" textFill="WHITE" />
@@ -123,11 +123,11 @@
             <Pane fx:id="pane_uv" prefHeight="467.0" prefWidth="621.0" style="-fx-background-color: rgba(0,0,0,0.5);">
                <children>
                   <ProgressBar fx:id="prog_uv" layoutX="-61.0" layoutY="228.0" prefHeight="28.0" prefWidth="417.0" progress="0.81" rotate="-90.0" />
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="34.0" prefHeight="74.0" prefWidth="109.0" style="-fx-background-color: rgba(219,68,55,1);" text="10 - 11&#10;Danger" textAlignment="CENTER" textFill="WHITE" />
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="115.0" prefHeight="144.0" prefWidth="109.0" style="-fx-background-color: rgba(244,160,0,1);" text="6 - 9&#10;Warning" textAlignment="CENTER" textFill="WHITE" />
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="266.0" prefHeight="107.0" prefWidth="109.0" style="-fx-background-color: rgba(15,157,88,1);" text="3 - 5&#10;Safe&#10;" textAlignment="CENTER" textFill="WHITE" />
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="380.0" prefHeight="68.0" prefWidth="109.0" style="-fx-background-color: rgba(66,133,244,1);" text="0 - 2&#10;Clear" textAlignment="CENTER" textFill="WHITE" />
-                  <Label alignment="TOP_LEFT" layoutX="182.0" layoutY="107.0" prefHeight="219.0" prefWidth="427.0" text="The ultraviolet index, or UV index, is an international standard measurement of the strength of sunburn-producing ultraviolet (UV) radiation at a particular place and time. The scale was developed by Canadian scientists in 1992, and then adopted and standardized by the UN's World Health Organization and World Meteorological Organization in 1994. It is primarily used in daily forecasts aimed at the general public, and is increasingly available as an hourly forecast as well.&#10;" textFill="WHITE" wrapText="true">
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="34.0" prefHeight="74.0" prefWidth="109.0" style="-fx-background-color: rgba(219,68,55,1);" text="10 - 11&#10;Danger" textAlignment="CENTER" />
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="115.0" prefHeight="144.0" prefWidth="109.0" style="-fx-background-color: rgba(244,160,0,1);" text="6 - 9&#10;Warning" textAlignment="CENTER" />
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="266.0" prefHeight="107.0" prefWidth="109.0" style="-fx-background-color: rgba(15,157,88,1);" text="3 - 5&#10;Safe&#10;" textAlignment="CENTER" />
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="14.0" layoutY="380.0" prefHeight="68.0" prefWidth="109.0" style="-fx-background-color: rgba(66,133,244,1);" text="0 - 2&#10;Clear" textAlignment="CENTER" />
+                  <Label alignment="TOP_LEFT" layoutX="182.0" layoutY="108.0" prefHeight="219.0" prefWidth="427.0" text="The ultraviolet index, or UV index, is an international standard measurement of the strength of sunburn-producing ultraviolet (UV) radiation at a particular place and time. The scale was developed by Canadian scientists in 1992, and then adopted and standardized by the UN's World Health Organization and World Meteorological Organization in 1994. It is primarily used in daily forecasts aimed at the general public, and is increasingly available as an hourly forecast as well.&#10;" textFill="WHITE" wrapText="true">
                      <font>
                         <Font name="Arial" size="13.0" />
                      </font>

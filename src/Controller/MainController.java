@@ -20,7 +20,9 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -43,29 +45,29 @@ import java.util.List;
 
 public class MainController {
     // register semua component pada form main
-    @FXML Label lbl_date,lbl_temp,lbl_unit,lbl_place,lbl_feels,lbl_update,lbl_weather,lbl_air,lbl_uv;
-    @FXML ImageView icon,bg,iv_about,iv_setting;
+    @FXML Label lbl_date,lbl_temp,lbl_unit,lbl_place,lbl_feels,lbl_update,lbl_weather,lbl_air,lbl_uv,lbl_humidity,lbl_wind;
+    @FXML ImageView iv_weather,iv_bg,iv_about,iv_setting,iv_wind,iv_humidity,iv_refresh;
     @FXML ListView<String> lv_city;
     @FXML ProgressIndicator pb_loading;
     @FXML ProgressBar prog_uv,prog_air;
+    @FXML Pane pane_weekly ,pane_daily,pane_air,pane_uv;
     @FXML private TableView<weatherDailyModel> tbl_daily;
-    @FXML private TableColumn<weatherDailyModel,String> DimgCol;
+    //@FXML private TableColumn<weatherDailyModel,String> DimgCol;
     @FXML private TableColumn<weatherDailyModel,String> DdateCol;
     @FXML private TableColumn<weatherDailyModel,String> DtempCol;
     @FXML private TableColumn<weatherDailyModel,String> DwindCol;
     @FXML private TableColumn<weatherDailyModel,String> DhumCol;
-
     @FXML private TableView<weatherDailyModel> tbl_weekly;
-    @FXML private TableColumn<weatherDailyModel,String> WimgCol;
+    //@FXML private TableColumn<weatherDailyModel,String> WimgCol;
     @FXML private TableColumn<weatherDailyModel,String> WdateCol;
     @FXML private TableColumn<weatherDailyModel,String> WtempCol;
     @FXML private TableColumn<weatherDailyModel,String> WwindCol;
     @FXML private TableColumn<weatherDailyModel,String> WhumCol;
-
     //===================================================================
     private ObservableList<weatherDailyModel> weatherweeklydata  = FXCollections.observableArrayList();
     private ObservableList<weatherDailyModel> weatherdailydata  = FXCollections.observableArrayList();
-
+    private boolean refreshed = false;
+    private RotateTransition refrotate;
     //menginisialisasi TableColumn pada Tableview dan memuat data
     @FXML private void initialize() {
         DdateCol.setCellValueFactory(cellData -> cellData.getValue().DateProperty());
@@ -76,9 +78,11 @@ public class MainController {
         WtempCol.setCellValueFactory(cellData -> cellData.getValue().TempProperty());
         WwindCol.setCellValueFactory(cellData -> cellData.getValue().WindProperty());
         WhumCol.setCellValueFactory(cellData -> cellData.getValue().HumProperty());
-        refreshdata();
-        iv_setting.setImage(svgset("/img/icon/gear.svg"));
-        iv_about.setImage(svgset("/img/icon/info.svg"));
+        iv_refresh.setImage(svgset("/res/img/icon/refresh.svg"));
+        iv_humidity.setImage(svgset("/res/img/icon/place.svg"));
+        iv_wind.setImage(svgset("/res/img/icon/wind.svg"));
+        iv_setting.setImage(svgset("/res/img/icon/gear.svg"));
+        iv_about.setImage(svgset("/res/img/icon/info.svg"));
         double y_about = iv_about.getX();
         iv_setting.setSmooth(true);
         TranslateTransition translation = new TranslateTransition(Duration.seconds(0.1), iv_about);
@@ -89,9 +93,40 @@ public class MainController {
         RotateTransition rotation = new RotateTransition(Duration.seconds(0.5), iv_setting);
         rotation.setCycleCount(Animation.INDEFINITE);
         rotation.setByAngle(180);
+        refrotate = new RotateTransition(Duration.seconds(0.5), iv_refresh);
+        refrotate.setCycleCount(Animation.INDEFINITE);
+        refrotate.setByAngle(180);
         iv_setting.setOnMouseEntered(e -> rotation.play());
         iv_setting.setOnMouseExited(e -> rotation.pause());
+        iv_refresh.setOnMouseEntered(e -> refrotate.play());
+        iv_refresh.setOnMouseExited(e ->{ if(!refreshed) refrotate.pause(); });
         iv_about.setOnMouseEntered(e -> translation.play());
+        handleDaily();
+        refreshdata();
+    }
+    @FXML private void handleDaily(){
+        pane_weekly.setVisible(false);
+        pane_daily.setVisible(true);
+        pane_air.setVisible(false);
+        pane_uv.setVisible(false);
+    }
+    @FXML private void handleWeekly(){
+        pane_weekly.setVisible(true);
+        pane_daily.setVisible(false);
+        pane_air.setVisible(false);
+        pane_uv.setVisible(false);
+    }
+    @FXML private void handleAir(){
+        pane_weekly.setVisible(false);
+        pane_daily.setVisible(false);
+        pane_air.setVisible(true);
+        pane_uv.setVisible(false);
+    }
+    @FXML private void handleUV(){
+        pane_weekly.setVisible(false);
+        pane_daily.setVisible(false);
+        pane_air.setVisible(false);
+        pane_uv.setVisible(true);
     }
     @FXML private void handleClose(){
         Platform.exit();
@@ -170,7 +205,7 @@ public class MainController {
         tbl_daily.getItems().clear();
         tbl_weekly.getItems().clear();
         //Set BG (biar gk keliatan kosong saat Run awal / loading)
-        if (bg.getImage()==null) setbg("13n");
+        if (iv_bg.getImage()==null) setbg("13n");
         Configuration cfg = new Configuration();
         //buat list dari kota yg terdapat di localconfig
         ObservableList<String> items = FXCollections.observableList(cfg.getCitys(3));
@@ -191,15 +226,21 @@ public class MainController {
                     VBox hBox = new VBox(5);
                     hBox.setAlignment(Pos.BOTTOM_CENTER);
                     //tambahkan imageview dan label
-                    hBox.getChildren().addAll(new ImageView(new Image("https://picsum.photos/100/150", true)), new Label(name));
+                    //https://picsum.photos/1200/800
+                    Label lbl = new Label(name);
+                    lbl.setFont(new Font("Arial", 16));
+                    lbl.setStyle("-fx-font-weight: bold;-fx-text-fill: White;");
+                    hBox.getChildren().addAll(new ImageView(new Image("https://picsum.photos/160/260", true)), lbl);
                     //set containter kedalam cell listview
                     setGraphic(hBox);
                     //jangan lupa TRANSPARENT GAN
-                    setStyle("-fx-background-color: rgba(255, 255, 255, 0);-fx-selection-bar-non-focused: green ;");
+                    setStyle("-fx-background-color: rgba(255, 255, 255, 0);");
                     }
             }
         });
         //anggap aja loading yekan
+        refrotate.play();
+        refreshed=true;
         pb_loading.setVisible(true);
         new Thread() {
             public void run() {
@@ -248,14 +289,17 @@ public class MainController {
                                 }
                             }
                             // isi label
-                            String checkloc = firstApi.getString("country").equals(firstApi.getString("region")) ? firstApi.getString("region"):firstApi.getString("region")+", "+firstApi.getString("country");
+                            String checkloc = firstApi.getString("country").equals(firstApi.getString("region")) ? firstApi.getString("region")+", "+current.getJSONObject("sys").getString("country"):firstApi.getString("region")+", "+firstApi.getString("country");
                             lbl_place.setText(current.getString("name") + ", " + checkloc);
                             lbl_temp.setText(String.valueOf(termocheck(current.getJSONObject("main").getInt("temp"))));
-                            lbl_feels.setText("Feels Like "+termocheck(current.getJSONObject("main").getInt("feels_like")));
+                            lbl_feels.setText("Feels Like "+termocheck(current.getJSONObject("main").getInt("feels_like"))+" °"+cfg.getUnits());
                             lbl_update.setText("Update "+new SimpleDateFormat("HH:mm").format(new Date()));
                             lbl_unit.setText("°"+cfg.getUnits());
-                            lbl_date.setText(new SimpleDateFormat("EEE, d MMM").format(new Date()));
+                            lbl_date.setText(new SimpleDateFormat("EEEE, d MMMM yyyy").format(new Date()));
                             lbl_weather.setText(current.getJSONArray("weather").getJSONObject(0).getString("description"));
+                            lbl_humidity.setText(current.getJSONObject("main").get("humidity").toString()+"%");
+                            lbl_wind.setText(current.getJSONObject("wind").get("speed").toString()+" km/h");
+                            iv_wind.setRotate((current.getJSONObject("wind").getInt("deg")-50)-180);
                             //load data ke tableview
                             List<String> df = new ArrayList<>();
                             //ambil data list forecast dari first api
@@ -265,23 +309,25 @@ public class MainController {
                                 //checking yak , buat array simple yg nanti akan seleksi tgl berapa aja yg udah masuk (kalo udah masuk , gk perlu masuk lagi)
                                 if(!df.contains(hasil.getString("dt_txt").substring(0,10))){
                                     //parse data kedalam model
-                                    weatherweeklydata.add(new weatherDailyModel("",hasil.getString("dt_txt").substring(0,10),termocheck(main.getInt("temp"))+" "+cfg.getUnits(),hasil.getJSONObject("wind").getDouble("speed")+" Kmph",main.getInt("humidity")+"%"));
+                                    weatherweeklydata.add(new weatherDailyModel("",hasil.getString("dt_txt").substring(0,10),termocheck(main.getInt("temp"))+" "+cfg.getUnits(),hasil.getJSONObject("wind").getDouble("speed")+" km/h",main.getInt("humidity")+"%"));
                                     //ok tgl ini telah masuk , ayo kita siapkan kedalam selector (biar ak masuk lagi - duplicate day)
                                     df.add(hasil.getString("dt_txt").substring(0,10));
                                 }
                                 //cari tanggal yg sama untuk data harian dong (beda nya terdapat data di tiap jam)
                                 if(hasil.getString("dt_txt").startsWith(new SimpleDateFormat("yyyy-MM-dd").format(new Date()))) {
                                     //parse data kedalam model
-                                    weatherdailydata.add(new weatherDailyModel("",hasil.getString("dt_txt"),termocheck(main.getInt("temp"))+" "+cfg.getUnits(),hasil.getJSONObject("wind").getDouble("speed")+" Kmph",main.getInt("humidity")+"%"));
+                                    weatherdailydata.add(new weatherDailyModel("",hasil.getString("dt_txt"),termocheck(main.getInt("temp"))+" "+cfg.getUnits(),hasil.getJSONObject("wind").getDouble("speed")+" km/h",main.getInt("humidity")+"%"));
                                 }
                             }
                             //data udah diparsekan , saat nya memuat data dari model kedalam tableview
                             tbl_weekly.setItems(weatherweeklydata);
                             tbl_daily.setItems(weatherdailydata);
                             //ubah icon dan background berdasarkan api
-                            icon.setImage(svgset("/img/icon/" + geticon(current.getJSONArray("weather").getJSONObject(0).getString("description"))));
+                            iv_weather.setImage(svgset("/res/img/icon/" + geticon(current.getJSONArray("weather").getJSONObject(0).getString("description"))));
                             setbg(current.getJSONArray("weather").getJSONObject(0).getString("icon"));
                             //dah loading selesai
+                            refrotate.pause();
+                            refreshed=false;
                             pb_loading.setVisible(false);
                         }
                     });
@@ -313,12 +359,12 @@ public class MainController {
     }
     //Memuat Background pada aplikasi
     private void setbg(String wa){
-        bg.setImage(new Image("img/bg/" + getbg(wa)));
-        bg.setPreserveRatio(true);
+        iv_bg.setImage(new Image("https://picsum.photos/1400/800",true));
+        iv_bg.setPreserveRatio(true);
         //color adjust = biar bg nya agak gelap dikit (tulisan yg putih soalnya hehe)
         ColorAdjust colorAdjust = new ColorAdjust();
-        colorAdjust.setBrightness(-0.3);
-        bg.setEffect(colorAdjust);
+        colorAdjust.setBrightness(-0.5);
+        iv_bg.setEffect(colorAdjust);
     }
     //merender file svg menjadi Image dengan bantuan class Transcoder
     private Image svgset(String path){
@@ -343,49 +389,7 @@ public class MainController {
             return (cfg.getUnits().equals("C"))?h:((h*9/5) + 32);
         }
     }
-    //mendapatkan bg berdasarkan nomor IP
-    private String getbg(String w){
-        switch (w) {
-            case "01d":
-                return "Clear-Sky-Day-3.jpg";
-            case "01n":
-                return "Clear-Sky-Night.jpg";
-            case "02d":
-                return "Partly-Cloudy-Day.jpg";
-            case "02n":
-                return "Partly-Cloudy-Night.jpg";
-            case "03d":
-                return "Scattered-Clouds.jpg";
-            case "03n":
-                return "Scattered-Clouds-Night.jpg";
-            case "04d":
-                return "Broken-Clouds-Day.jpg";
-            case "04n":
-                return "Broken-Clouds-Night.jpg";
-            case "09d":
-                return "Shower-Rain-Day.jpg";
-            case "09n":
-                return "Shower-Rain-Night.jpg";
-            case "10d":
-                return "Rain-Day.jpg";
-            case "10n":
-                return "Rain-Night.jpg";
-            case "11d":
-                return "Thunderstorm-Day.jpg";
-            case "11n":
-                return "Thunderstorm-Night.jpg";
-            case "13d":
-                return "Snow-Day.jpg";
-            case "13n":
-                return "Snow-Night.jpg";
-            case "50d":
-                return "Mist-Day.jpg";
-            case "50n":
-                return "Mist-Night.jpg";
-            default:
-                return "Clear-Sky-Day-3.jpg";
-        }
-    }
+
     //mendapatkan icon berdasarkan deksripsi
     public String geticon(String w){
         if(w.contains("clear sky")){

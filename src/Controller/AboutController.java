@@ -12,7 +12,7 @@ public class AboutController {
     @FXML ImageView imgbg;
     //menginisialisasi image dan set rasio nya
     @FXML public void initialize() {
-        imgbg.setImage(new Image("/img/bg/bg.png"));
+        imgbg.setImage(new Image("/res/img/bg/bg.png"));
         imgbg.setPreserveRatio(false);
     }
 }

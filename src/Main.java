@@ -5,12 +5,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/View/Main1.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/View/Main.fxml"));
         primaryStage.setTitle("Weather Information Over Internet Protocol");
-        primaryStage.setScene(new Scene(root));
+        Scene sc = new Scene(root);
+        sc.getStylesheets().add(getClass().getResource("/res/main.css").toExternalForm());
+        primaryStage.setScene(sc);
         primaryStage.setResizable(false);
         primaryStage.show();
     }

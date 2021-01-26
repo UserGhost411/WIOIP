@@ -34,17 +34,17 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView fx:id="TableLocation" layoutX="14.0" layoutY="14.0" prefHeight="258.0" prefWidth="413.0">
+                        <TableView fx:id="TableLocation" layoutX="14.0" layoutY="14.0" prefHeight="287.0" prefWidth="430.0">
                            <columns>
                               <TableColumn fx:id="cityCol" prefWidth="188.0" text="City Name" />
-                              <TableColumn fx:id="defCol" minWidth="0.0" prefWidth="84.0" text="is Default" />
-                              <TableColumn fx:id="addedCol" minWidth="0.0" prefWidth="125.0" text="Added" />
+                              <TableColumn fx:id="defCol" minWidth="0.0" prefWidth="109.0" text="is Default" />
+                              <TableColumn fx:id="addedCol" minWidth="0.0" prefWidth="116.0" text="Added" />
                            </columns>
                         </TableView>
-                        <Button layoutX="443.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleAdd" prefHeight="28.0" prefWidth="90.0" text="Add City" />
-                        <Button layoutX="443.0" layoutY="86.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="28.0" prefWidth="90.0" text="Delete" />
-                        <Button layoutX="443.0" layoutY="244.0" mnemonicParsing="false" onAction="#handleDefault" prefHeight="28.0" prefWidth="90.0" text="Set Default" />
-                        <Button layoutX="443.0" layoutY="51.0" mnemonicParsing="false" onAction="#handleUp" prefHeight="28.0" prefWidth="90.0" text="Up" />
+                        <Button layoutX="451.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleAdd" prefHeight="28.0" prefWidth="90.0" text="Add City" />
+                        <Button layoutX="451.0" layoutY="86.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="28.0" prefWidth="90.0" text="Delete" />
+                        <Button layoutX="451.0" layoutY="273.0" mnemonicParsing="false" onAction="#handleDefault" prefHeight="28.0" prefWidth="90.0" text="Set Default" />
+                        <Button layoutX="451.0" layoutY="51.0" mnemonicParsing="false" onAction="#handleUp" prefHeight="28.0" prefWidth="90.0" text="Up" />
                      </children>
                   </AnchorPane>
             </content>
