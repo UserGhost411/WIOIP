@@ -42,7 +42,6 @@ public class SettingsController {
         Stage dialogStage = new Stage();
         //window
         dialogStage.setTitle("Add Location");
-        //
         dialogStage.initStyle(StageStyle.UTILITY);
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setResizable(false);
@@ -52,6 +51,35 @@ public class SettingsController {
         controller.setDialogStage(dialogStage);
         dialogStage.showAndWait();
         readdata();
+    }
+    @FXML
+    private void handleUp() throws Exception {
+        int selectID = TableLocation.getSelectionModel().getSelectedIndex();
+        if(selectID >= 0){
+            if(selectID==0) return;
+            Configuration cfg = new Configuration();
+            JSONObject d = cfg.getSetting();
+            //tukar nilai dari {index} dan {index - 1}
+            JSONObject simpan = d.getJSONArray("locations").getJSONObject(selectID);
+            JSONObject simpan2 = d.getJSONArray("locations").getJSONObject(selectID-1);
+            d.getJSONArray("locations").put(selectID-1,simpan);
+            d.getJSONArray("locations").put(selectID,simpan2);
+            //simpan config
+            cfg.setSetting(d);
+            //reload dan tampilkan ulang data yg telah di ubah
+            readdata();
+            //fokuskan ke item yg telah diubah
+            TableLocation.requestFocus();
+            TableLocation.getSelectionModel().select(selectID-1);
+            TableLocation.getFocusModel().focus(selectID-1);
+        }else {
+            //belum pilih item di tableview
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText("No Data Selected");
+            alert.setContentText("Please select data from table");
+            alert.showAndWait();
+        }
     }
     @FXML
     private void handleDefault() throws Exception {

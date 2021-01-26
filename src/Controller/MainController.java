@@ -31,9 +31,7 @@ public class MainController {
     @FXML LineChart<String,Number> charthourly;
     @FXML LineChart<String,Number> chartdaily;
     @FXML ImageView imgweather;
-    @FXML public void initialize() {
-        refreshdata();
-    }
+    @FXML public void initialize() { refreshdata(); }
     @FXML public void handleClose(){
         Platform.exit();
     }
@@ -129,17 +127,12 @@ public class MainController {
                 Image img = SwingFXUtils.toFXImage(transcoder.getBufferedImage(), null);
                 imgweather.setImage(img);
             } catch (TranscoderException ex) { ex.printStackTrace(); }
-        }
-        catch (IOException io) { io.printStackTrace(); }
+        } catch (IOException io) { io.printStackTrace(); }
     }
     public class BufferedImageTranscoder extends ImageTranscoder {
         private BufferedImage img = null;
-        @Override
-        public BufferedImage createImage(int width, int height) {
-            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        }
-        @Override
-        public void writeImage(BufferedImage img, TranscoderOutput to) throws TranscoderException { this.img = img; }
+        @Override public BufferedImage createImage(int width, int height) { return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB); }
+        @Override public void writeImage(BufferedImage img, TranscoderOutput to) throws TranscoderException { this.img = img; }
         public BufferedImage getBufferedImage() {
             return img;
         }

@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.LocationModel;
+import Model.PlaceModel;
 import Module.Configuration;
 import Module.Requester;
 import javafx.application.Platform;
@@ -10,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -18,6 +18,7 @@ import java.util.Date;
 public class AddPlaceController {
     private Stage dialogStage;
     // register semua component pada form AddPlace
+    @FXML private ProgressIndicator pb_loading;
     @FXML private TableView<LocationModel> tbl_location;
     @FXML private TableColumn<LocationModel,String> cityCol;
     @FXML private TableColumn<LocationModel,String> locCol;
@@ -28,6 +29,7 @@ public class AddPlaceController {
     @FXML public void initialize() {
         cityCol.setCellValueFactory(cellData -> cellData.getValue().CityProperty());
         locCol.setCellValueFactory(cellData -> cellData.getValue().LocProperty());
+        pb_loading.setVisible(false);
     }
     public void setDialogStage(Stage dialogStage){
         this.dialogStage = dialogStage;
@@ -35,6 +37,8 @@ public class AddPlaceController {
     public void handleSearch(){
         //request data dengan mencari data lokasi pada api
         Requester rq = new Requester();
+        //loading
+        pb_loading.setVisible(true);
         new Thread() {
             public void run() {
                 //parse JSON kedalam bentuk object
@@ -51,10 +55,12 @@ public class AddPlaceController {
                     public void run() {
                         //muat data dalam model kedalam tableview
                         tbl_location.setItems(locationdata);
+                        pb_loading.setVisible(false);
                     }
                 });
             }
         }.start();
+
     }
     public void handleAdd() throws Exception {
         int selectID = tbl_location.getSelectionModel().getSelectedIndex();
